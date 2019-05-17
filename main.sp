@@ -4,9 +4,9 @@
 .param	Lmin=100n
 .temp	25
 *********************Source Voltages**************
-Vds		Vdd	0  	dc	5
-Vin 	in 	0 	dc PULSE(0V 5V 50us 6us 6us 50us 120us)
-Vin1 	in1	0 	dc PULSE(0V 5V 40us 6us 6us 40us 120us)
+Vds		Vdd	0  	dc	1
+Vin 	in 	0 	dc PULSE(0V 1V 5us 0.5us 0.5us 5us 30us)
+Vin1 	in1	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 100us)
 **************************** sub circuits **********************
 **** Inverter *****
 
@@ -58,29 +58,29 @@ Vin1 	in1	0 	dc PULSE(0V 5V 40us 6us 6us 40us 120us)
 
 ************************************** DFF **************************************
 
-.subckt DFF clk D_in Vdd Gnd Qs 
+.subckt DFF clk D_in Vdd Gnd Qs Qm
 * Subcircuit Body
 	
 	Xinv1 clk Vdd Gnd not_clk Inverter
 
 *********** drain 	gate 	source 		body 		mname 
-	M1   	Qm 		not_clk	x1     		x1     		pch 	w='5*lmin'  l='lmin'
-	M2   	Qm   	clk    	x1     		x1 	     	nch 	w='5*lmin'  l='lmin'
+	M1   	x1 		not_clk	Qm     		Qm     		pch 	w='5*lmin'  l='lmin'
+	M2   	x1   	clk    	Qm     		Qm 	     	nch 	w='5*lmin'  l='lmin'
 
-	M3   	D_in   	clk		x1     		x1     		pch 	w='5*lmin'  l='lmin'
-	M4   	D_in   	not_clk x1     		x1 	     	nch 	w='5*lmin'  l='lmin'
+	M3   	x1   	clk		D_in     	D_in   		pch 	w='5*lmin'  l='lmin'
+	M4   	x1   	not_clk D_in     	D_in     	nch 	w='5*lmin'  l='lmin'
 
-	Xinv2 	x1 Vdd Gnd not_Qm Inverter
-	Xinv3 	not_Qm Vdd Gnd Qm Inverter
+	Xinv2 	x1 		Vdd Gnd not_Qm 	Inverter
+	Xinv3 	not_Qm 	Vdd Gnd Qm 		Inverter
 
-	M5   	Qm   	clk		x2     		x2 	     	nch 	w='5*lmin'  l='lmin'
-	M6   	Qm   	not_clk	x2    		x2	     	pch 	w='5*lmin'  l='lmin'
+	M5   	x2   	clk		Qm     		Qm 	     	nch 	w='5*lmin'  l='lmin'
+	M6   	x2   	not_clk	Qm    		Qm	     	pch 	w='5*lmin'  l='lmin'
 
-	M7   	Qs   	not_clk	x2     		x2 	     	nch 	w='5*lmin'  l='lmin'
-	M8   	Qs   	clk 	x2    		x2	     	pch 	w='5*lmin'  l='lmin'
+	M7   	x2   	not_clk	Qs     		Qs 	     	nch 	w='5*lmin'  l='lmin'
+	M8   	x2   	clk 	Qs    		Qs	     	pch 	w='5*lmin'  l='lmin'
 
-	Xinv4 	x2 Vdd Gnd not_Qs Inverter
-	Xinv5 	not_Qs Vdd Gnd Qs Inverter
+	Xinv4 	x2 		Vdd Gnd not_Qs 	Inverter
+	Xinv5 	not_Qs 	Vdd Gnd Qs 		Inverter
 
 .ends DFF
 
@@ -92,7 +92,7 @@ Vin1 	in1	0 	dc PULSE(0V 5V 40us 6us 6us 40us 120us)
 
 ******************* Gate Level Implementation ***********************
 * Xinv1 in Vdd Gnd out Inverter
-XDFF Vdd in Vdd Gnd Qs DFF
+XDFF in in1 Vdd 0 Qs Qm DFF
 **********************************************************************
 .OP
 * .TF V(output,0) VIN
