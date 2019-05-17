@@ -5,8 +5,10 @@
 .temp	25
 *********************Source Voltages**************
 Vds		Vdd	0  	dc	1
-Vin 	in 	0 	dc PULSE(0V 1V 5us 0.5us 0.5us 5us 30us)
-Vin1 	in1	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 100us)
+Vin 	in 	0 	dc PULSE(0V 1V 5us 0.5us 0.5us 5us 20us)
+Vin1 	in1	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 30us)
+Vin2 	in2	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 15us)
+
 **************************** sub circuits **********************
 **** Inverter *****
 
@@ -58,7 +60,7 @@ Vin1 	in1	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 100us)
 
 ************************************** DFF **************************************
 
-.subckt DFF clk D_in Vdd Gnd Qs Qm
+.subckt DFF clk D_in Vdd Gnd Qs
 * Subcircuit Body
 	
 	Xinv1 clk Vdd Gnd not_clk Inverter
@@ -85,19 +87,30 @@ Vin1 	in1	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 100us)
 .ends DFF
 
 
-******************Transistor Level Implementation****************
-******* drain 	gate 	source 		body 		mname 
+
+************************************** FA **************************************
+
+.subckt FA A B C Vdd Gnd sum cout
+* Subcircuit Body
 	
-*************************************************
+	XXOR1 A 	B Vdd 0 out1 	XOR
+	XXOR2 out1 	C Vdd 0 sum 	XOR
+
+	XNAND1 A 	B vdd 0 out2 NAND
+	XNAND2 out1 C Vdd 0 out3 NAND
+
+	XNAND3 out2 out3 Vdd 0 cout NAND
+
+.ends FA
 
 ******************* Gate Level Implementation ***********************
-* Xinv1 in Vdd Gnd out Inverter
-XDFF in in1 Vdd 0 Qs Qm DFF
+
+XFA in in1 in2 Vdd 0 sum cout  FA
 **********************************************************************
 .OP
 * .TF V(output,0) VIN
 .probe
 * .dc  Vout	0	out	0.01
 .option post
-.TRAN 1ns 1000us
+.TRAN 1ns 100us
 .END
