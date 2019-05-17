@@ -12,14 +12,17 @@ Vin1 	in1	0 	dc PULSE(0V 5V 3us 0.5us 0.5us 5us 10us)
 
 .subckt Inverter in Vdd Gnd out 
 * Subcircuit Body
+*********** drain 	gate 	source 		body 		mname 
+
 	M1   	out   	in     	Vdd     	Vdd     	pch 	w='5*lmin'  l='lmin'
 	M2   	out   	in 		Gnd     	Gnd     	nch 	w='5*lmin'  l='lmin'
 .ends Inverter
 
-**** NAND *****
-
+*************************************** NAND **************************************
 .subckt NAND in1 in2 Vdd Gnd out 
 * Subcircuit Body
+*********** drain 	gate 	source 		body 		mname 
+
 	M1   	out   	in1    	Vdd     	Vdd     	pch 	w='5*lmin'  l='lmin'
 	M2   	out   	in2    	Vdd     	Vdd     	pch 	w='5*lmin'  l='lmin'
 
@@ -28,6 +31,30 @@ Vin1 	in1	0 	dc PULSE(0V 5V 3us 0.5us 0.5us 5us 10us)
 
 .ends NAND
 
+************************************** XOR **************************************
+
+.subckt XOR in1 in2 Vdd Gnd out 
+* Subcircuit Body
+	
+	Xinv1 in1 Vdd Gnd not_in1 Inverter
+	Xinv2 in2 Vdd Gnd not_in2 Inverter
+
+*********** drain 	gate 	source 		body 		mname 
+
+	M1   	x1   	not_in1	Vdd     	Vdd     	pch 	w='5*lmin'  l='lmin'
+	M2   	out   	in2    	x1     		x1 	     	pch 	w='5*lmin'  l='lmin'
+
+	M3   	x2    	not_in2	Vdd     	Vdd     	pch 	w='5*lmin'  l='lmin'
+	M4   	out   	in1    	x2     		x2 	     	pch 	w='5*lmin'  l='lmin'
+
+	M5   	out   	in1		x3     		x3 	     	nch 	w='5*lmin'  l='lmin'
+	M6   	x3   	in2		Gnd    		Gnd	     	nch 	w='5*lmin'  l='lmin'
+
+	M7   	out   	not_in1	x4     		x4 	     	nch 	w='5*lmin'  l='lmin'
+	M8   	x4   	not_in2	Gnd    		Gnd	     	nch 	w='5*lmin'  l='lmin'
+
+.ends XOR
+
 ******************Transistor Level Implementation****************
 ******* drain 	gate 	source 		body 		mname 
 	
@@ -35,7 +62,7 @@ Vin1 	in1	0 	dc PULSE(0V 5V 3us 0.5us 0.5us 5us 10us)
 
 ******************* Gate Level Implementation ***********************
 * Xinv1 in Vdd Gnd out Inverter
-XNAND1 in in1 Vdd Gnd out NAND
+XXOR in in1 Vdd Gnd out XOR
 **********************************************************************
 .OP
 * .TF V(output,0) VIN
