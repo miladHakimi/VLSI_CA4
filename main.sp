@@ -11,7 +11,6 @@ Vin2 	in2	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 15us)
 
 **************************** sub circuits **********************
 **** Inverter *****
-
 .subckt Inverter in Vdd Gnd out 
 * Subcircuit Body
 *********** drain 	gate 	source 		body 		mname 
@@ -34,7 +33,6 @@ Vin2 	in2	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 15us)
 .ends NAND
 
 ************************************** XOR **************************************
-
 .subckt XOR in1 in2 Vdd Gnd out 
 * Subcircuit Body
 	
@@ -59,12 +57,10 @@ Vin2 	in2	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 15us)
 
 
 ************************************** DFF **************************************
-
 .subckt DFF clk D_in Vdd Gnd Qs
 * Subcircuit Body
 	
 	Xinv1 clk Vdd Gnd not_clk Inverter
-
 *********** drain 	gate 	source 		body 		mname 
 	M1   	x1 		not_clk	Qm     		Qm     		pch 	w='5*lmin'  l='lmin'
 	M2   	x1   	clk    	Qm     		Qm 	     	nch 	w='5*lmin'  l='lmin'
@@ -86,10 +82,7 @@ Vin2 	in2	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 15us)
 
 .ends DFF
 
-
-
 ************************************** FA **************************************
-
 .subckt FA A B C Vdd Gnd sum cout
 * Subcircuit Body
 	
@@ -103,9 +96,21 @@ Vin2 	in2	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 15us)
 
 .ends FA
 
+************************************** HA **************************************
+.subckt HA A B Vdd Gnd sum cout
+* Subcircuit Body
+	
+	XXOR1 A B Vdd 0 sum XOR
+
+	XNAND1 A B Vdd 0 out1 NAND
+
+	Xinv1 out1 Vdd 0 cout Inverter
+
+.ends HA
+
 ******************* Gate Level Implementation ***********************
 
-XFA in in1 in2 Vdd 0 sum cout  FA
+XFA in in1 Vdd 0 sum cout  HA
 **********************************************************************
 .OP
 * .TF V(output,0) VIN
