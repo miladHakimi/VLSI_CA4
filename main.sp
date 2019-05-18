@@ -5,10 +5,13 @@
 .temp	25
 *********************Source Voltages**************
 Vds		Vdd	0  	dc	1
-Vin 	in 	0 	dc PULSE(0V 1V 5us 0.5us 0.5us 5us 20us)
-Vin1 	in1	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 30us)
+Vclk 	clk	0 	dc PULSE(0V 1V 50ns 0 0 50ns 100ns)
+Vin 	in 	0 	dc PULSE(0V 1V 80ns 0 0 80ns 200ns)
+Vin1 	in1	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 50us)
 Vin2 	in2	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 15us)
 
+********************* Vectors **********************
+.vec "cp.txt"
 **************************** sub circuits **********************
 **** Inverter *****
 .subckt Inverter in Vdd Gnd out 
@@ -108,14 +111,73 @@ Vin2 	in2	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 15us)
 
 .ends HA
 
-******************* Gate Level Implementation ***********************
+************************************** 8 bit Adder **************************************
+XDFF0 clk X0 Vdd 0 X0_out DFF 
+XDFF1 clk X1 Vdd 0 X1_out DFF
+XDFF2 clk X2 Vdd 0 X2_out DFF
+XDFF3 clk X3 Vdd 0 X3_out DFF
+XDFF4 clk X4 Vdd 0 X4_out DFF
+XDFF5 clk X5 Vdd 0 X5_out DFF
+XDFF6 clk X6 Vdd 0 X6_out DFF
+XDFF7 clk X7 Vdd 0 X7_out DFF
 
-XFA in in1 Vdd 0 sum cout  HA
+XDFF8  clk Y0 Vdd 0 Y0_out DFF
+XDFF9  clk Y1 Vdd 0 Y1_out DFF
+XDFF10 clk Y2 Vdd 0 Y2_out DFF
+XDFF11 clk Y3 Vdd 0 Y3_out DFF
+XDFF12 clk Y4 Vdd 0 Y4_out DFF
+XDFF13 clk Y5 Vdd 0 Y5_out DFF
+XDFF14 clk Y6 Vdd 0 Y6_out DFF
+XDFF15 clk Y7 Vdd 0 Y7_out DFF
+
+XHA X0_out Y0_out Vdd 0 out0 C1 HA
+XDFF16 clk out0 Vdd 0 S0 DFF
+
+XFA1 X1_out Y1_out C1 Vdd 0 out1 C2 FA
+XDFF17 clk out1 Vdd 0 S1 DFF
+
+XFA2 X2_out Y2_out C2 Vdd 0 out2 C3 FA
+XDFF18 clk out2 Vdd 0 S2 DFF
+
+XFA3 X3_out Y3_out C3 Vdd 0 out3 C4 FA
+XDFF19 clk out3 Vdd 0 S3 DFF
+
+XFA4 X4_out Y4_out C4 Vdd 0 out4 C5 FA
+XDFF20 clk out4 Vdd 0 S4 DFF
+
+XFA5 X5_out Y5_out C5 Vdd 0 out5 C6 FA
+XDFF21 clk out5 Vdd 0 S5 DFF
+
+XFA6 X6_out Y6_out C6 Vdd 0 out6 C7 FA
+XDFF22 clk out6 Vdd 0 S6 DFF
+
+XFA7 X7_out Y7_out C7 Vdd 0 out7 C8 FA
+XDFF23 clk out7 Vdd 0 S7 DFF
+
+XDFF24 clk c8 Vdd 0 cout DFF
+
+
+
 **********************************************************************
 .OP
-* .TF V(output,0) VIN
+
+******** setup time measure *************
+* .MEASURE Tran SetupTime	
+* + Trig v(in)  Val = 'v(Vdd)/2.0' CROSS = 1
+* + Targ v(clk) Val = 'v(Vdd)/2.0' Fall = 1
+
+******************* Adder Delay ***************
+.MEASURE TRAN delay 
++	TRIG V(X0) 	VAL='v(Vdd)/2.0' 	Rise=1
++   TARG V(C8) 	VAL='v(Vdd)/2.0'    Rise=1
+
 .probe
 * .dc  Vout	0	out	0.01
 .option post
-.TRAN 1ns 100us
+.TRAN 1ns 10us
+
+.SAVE TYPE=NODESET FILE=my_design.err LEVEL=TOP
++ TIME=20ns
+
+
 .END
