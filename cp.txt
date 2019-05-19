@@ -1,0 +1,17 @@
+radix 	4 4 4 4 4 4 1
+io 		i i i i o o o
+tunit ns
+vih 1
+vname X[7:0] Y[7:0] S[7:0] cout
+0		00		00	zz		z 
+112		FF 		81	zz	 	z
+222		02		75	zz		z
+332		A0		C5	zz		z
+442		01		10	zz		z
+552		FF		FF	zz		z
+662		11		Fa	zz		z
+772		87		75	zz		z
+882		e1		b2	zz		z
+992		e5		c4	zz		z
+1102	9a		02	zz		z
+1212	10		00	zz 		Z
