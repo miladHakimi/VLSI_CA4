@@ -5,7 +5,7 @@
 .temp	25
 *********************Source Voltages**************
 Vds		Vdd	0  	dc	1
-Vclk 	clk	0 	dc PULSE(0V 1V 50ns 0 0 50ns 100ns)
+Vclk 	clk	0 	dc PULSE(0V 1V 55ns 0 0 55ns 110ns)
 Vin 	in 	0 	dc PULSE(0V 1V 80ns 0 0 80ns 200ns)
 Vin1 	in1	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 50us)
 Vin2 	in2	0 	dc PULSE(0V 1V 4us 0.5us 0.5us 4us 15us)
@@ -161,23 +161,25 @@ XDFF24 clk c8 Vdd 0 cout DFF
 **********************************************************************
 .OP
 
-******** setup time measure *************
-* .MEASURE Tran SetupTime	
-* + Trig v(in)  Val = 'v(Vdd)/2.0' CROSS = 1
-* + Targ v(clk) Val = 'v(Vdd)/2.0' Fall = 1
+******* setup time measure *************
+.MEASURE Tran SetupTime	
++ Trig v(X0)  Val = 'v(Vdd)/2.0' Rise = 1
++ Targ v(clk) Val = 'v(Vdd)/2.0' Fall = 1
 
 ******************* Adder Delay ***************
-.MEASURE TRAN delay 
-+	TRIG V(X0) 	VAL='v(Vdd)/2.0' 	Rise=1
-+   TARG V(C8) 	VAL='v(Vdd)/2.0'    Rise=1
+.MEASURE TRAN delay_cout 
++	TRIG V(Y0_out) 	VAL='v(Vdd)/2.0' 	Rise=1
++   TARG V(C8) 	VAL='v(Vdd)/2.0'    CROSS=1
+
+.MEASURE TRAN delay_sum 
++	TRIG V(X0_out) 	VAL='v(Vdd)/2.0' 	Rise=1
++   TARG V(S7) 	VAL='v(Vdd)/2.0'    Rise=1
+
 
 .probe
 * .dc  Vout	0	out	0.01
 .option post
-.TRAN 1ns 10us
-
-.SAVE TYPE=NODESET FILE=my_design.err LEVEL=TOP
-+ TIME=20ns
+.TRAN 1ns 1000ns
 
 
 .END
