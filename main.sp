@@ -175,11 +175,15 @@ XDFF24 clk c8 Vdd 0 cout DFF
 +	TRIG V(X0_out) 	VAL='v(Vdd)/2.0' 	Rise=1
 +   TARG V(S7) 	VAL='v(Vdd)/2.0'    Rise=1
 
+.measure AVG_CURRENT
++avg i(Vds) from = 0n to 120n
+.measure avg_power PARAM = ('AVG_CURRENT * 1')
 
 .probe
 * .dc  Vout	0	out	0.01
 .option post
 .TRAN 1ns 1000ns
 
-
+.tran 0.1p 1000n SWEEP MONTE=10
+.Autostop
 .END
